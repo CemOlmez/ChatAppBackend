@@ -1,0 +1,69 @@
+# =========================
+# Visual Studio
+# =========================
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# =========================
+# Build Results
+# =========================
+bin/
+obj/
+[Ll]og/
+*.log
+*.tlog
+*.cache
+*.dbmdl
+*.db
+
+# =========================
+# NuGet
+# =========================
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# =========================
+# ASP.NET
+# =========================
+App_Data/
+*.asp.dll
+*.asp.cs
+*.asp.cache
+
+# =========================
+# Configuration Files
+# =========================
+*.launchSettings.json
+appsettings.Development.json
+secrets.json
+
+# =========================
+# Rider / VS Code
+# =========================
+.idea/
+.vscode/
+*.code-workspace
+
+# =========================
+# Others
+# =========================
+TestResults/
+*.coverage
+*.coveragexml
+*.vsmdi
+_ReSharper*/ 
+*.DotSettings.user
+
+# Temporary files
+~$*
+*.tmp
+
+# Git
+*.orig
