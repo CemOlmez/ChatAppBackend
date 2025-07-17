@@ -1,25 +1,27 @@
-﻿using ChatApp.Application.DTOs;
+﻿using BCrypt.Net;
+using ChatApp.Application.DTOs;
 using ChatApp.Application.Interfaces;
 using ChatApp.Domain.Entities;
 using ChatApp.Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using BCrypt.Net;
 
 namespace ChatApp.Infrastructure.Services;
 
 public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
-    private readonly string _jwtKey = "super_secret_key_1234567890_abcdefghijklmno!"; // TODO: move to config
+    private readonly IConfiguration _configuration; // TODO: move to config
 
-    public AuthService(AppDbContext context)
+    public AuthService(AppDbContext context, IConfiguration configuration)
     {
         _context = context;
+        _configuration = configuration;
     }
 
     public async Task<AuthResponseDTO> RegisterAsync(RegisterRequestDTO request)
@@ -76,19 +78,21 @@ public class AuthService : IAuthService
     private AuthResponseDTO CreateAuthResponse(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_jwtKey);
+        var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Email, user.Email)
-            }),
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.Username),
+        new Claim(ClaimTypes.Email, user.Email)
+    }),
             Expires = DateTime.UtcNow.AddMinutes(15),
+            Issuer = _configuration["Jwt:Issuer"],              // ✅ Add this
+            Audience = _configuration["Jwt:Audience"],          // ✅ Add this
             SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -102,7 +106,19 @@ public class AuthService : IAuthService
         };
     }
 
-    private string GenerateRefreshToken()
+    public async Task<bool> LogoutAsync(string refreshToken)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        if (user == null)
+            return false;
+
+        user.RefreshToken = null;
+        user.RefreshTokenExpiryTime = DateTime.MinValue;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    private static string GenerateRefreshToken()
     {
         var bytes = new byte[32];
         using var rng = RandomNumberGenerator.Create();

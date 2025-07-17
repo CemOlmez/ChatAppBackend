@@ -30,9 +30,18 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh([FromBody] string refreshToken)
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDTO request)
     {
-        var result = await _authService.RefreshTokenAsync(refreshToken);
+        var result = await _authService.RefreshTokenAsync(request.RefreshToken);
         return Ok(result);
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout([FromBody] RefreshTokenRequestDTO request)
+    {
+        var result = await _authService.LogoutAsync(request.RefreshToken);
+        if (!result) return BadRequest("Logout failed. Token not found.");
+
+        return Ok("Logged out successfully.");
     }
 }
