@@ -1,8 +1,10 @@
-﻿using ChatApp.Application.DTOs.Message;
+﻿using ChatApp.API.DTOs;
+using ChatApp.Application.DTOs.Message;
 using ChatApp.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+
 
 namespace ChatApp.API.Controllers
 {
@@ -60,5 +62,36 @@ namespace ChatApp.API.Controllers
             var success = await _messageService.DeleteMessageAsync(id);
             return success ? NoContent() : NotFound();
         }
+
+
+        [HttpPost("upload")]
+        [RequestSizeLimit(10_000_000)] // 10MB max (adjust as needed)
+        public async Task<IActionResult> UploadFile([FromForm] FileUploadDTO request)
+        {
+            var file = request.File;
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var fileUrl = $"{Request.Scheme}://{Request.Host}/uploads/{fileName}";
+
+            return Ok(new { fileUrl });
+        }
+
+
+
     }
+
 }

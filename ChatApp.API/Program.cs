@@ -1,8 +1,9 @@
-﻿using ChatApp.Application.Interfaces;
-using ChatApp.Infrastructure.Services;
+﻿using ChatApp.API.Swagger;
+using ChatApp.Application.Interfaces;
 using ChatApp.Infrastructure.DbContext;
-using Microsoft.EntityFrameworkCore;
+using ChatApp.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -16,6 +17,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "ChatApp API", Version = "v1" });
+    c.OperationFilter<FileUploadOperation>();
 
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
@@ -77,6 +79,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
