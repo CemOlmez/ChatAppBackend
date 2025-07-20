@@ -151,31 +151,9 @@ To deploy your own version:
 
 4. **Deploy** and access the app from your Render subdomain.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ---
 
-## 📡 API Usage
+## API Usage
 
 ### Auth
 
@@ -198,8 +176,6 @@ To deploy your own version:
 | `/api/messages/{id}`                   | DELETE | Soft delete a message by ID                                         |
 
 
-
-
 ### Groups
 
 | Endpoint                               | Method | Description                                     |
@@ -209,8 +185,6 @@ To deploy your own version:
 | `/api/groups/{id}`                     | GET    | Get a group by its ID                           |
 | `/api/groups/{groupId}/users`          | GET    | Get all users in a specific group               |
 | `/api/groups/{groupId}/users/{userId}` | POST   | Add a user to a specific group (if not present) |
-
-
 
 
 ### Users
@@ -229,7 +203,16 @@ CI/CD was not fully implemented due to time constraints and because this was my 
 
 ## Testing
 
-Unit tests were not included due to limited time. In a real production scenario, I would use xUnit or NUnit to test core logic and controller behavior. This will be included in the next version.
+Testing wasn't added in this version due to time limitations and my current learning stage. I've not worked with testing frameworks like xUnit or NUnit yet, but I plan to implement proper unit and integration tests in future iterations as I learn more about them. The current focus was to get the backend working end-to-end with real features and cloud deployment.
+
+## Assumptions & Tradeoffs
+
+- Used local file storage for file uploads to simplify the setup. In production, cloud storage (e.g. AWS S3, Azure Blob) should be used.
+- SignalR is set up for real-time messaging but is not yet load-balanced or scaled. In production, a backplane (e.g. Redis or Azure SignalR) is needed.
+- JWT secret is hardcoded for local use only. In production, secrets should be securely stored (e.g. in environment variables or secret managers).
+- No frontend UI was developed — this is a backend-only project.
+- No automated testing or CI/CD pipelines were set up — focus was on functionality and deployment.
+- Docker Compose was used locally for PostgreSQL and Redis. On Render, those services need to be hosted separately or connected via cloud services.
 
 ---
 
