@@ -4,7 +4,7 @@
 A real-time chat backend built with ASP.NET Core, Entity Framework, PostgreSQL, SignalR, and Redis. This service supports secure authentication, private/group messaging, file uploads, and WebSocket-based real-time communication.
 
 ---
-Demo (deployed on Render): https://chatappbackend-gz8t.onrender.com/swagger
+Demo (deployed on Render):[BACKEND DEMO](https://chatappbackend-gz8t.onrender.com/swagger)
 
 ## Features
 
@@ -132,35 +132,39 @@ Access Swagger at: [http://localhost:8080/swagger](http://localhost:8080/swagger
 
 ### Messages
 
-| Endpoint                               | Method | Description                           |
-| -------------------------------------- | ------ | ------------------------------------- |
-| `/api/messages`                        | POST   | Send a message (DM or group)          |
-| `/api/messages/upload`                 | POST   | Upload a file (up to 10MB)            |
-| `/api/messages/group/{groupId}`        | GET    | Get paginated messages in a group     |
-| `/api/messages/group/{groupId}/search` | GET    | Search messages in a group by keyword |
-| `/api/messages/{id}`                   | PUT    | Update/edit a message                 |
-| `/api/messages/{id}`                   | DELETE | Soft-delete a message                 |
+| Endpoint                               | Method | Description                                                         |
+| -------------------------------------- | ------ | ------------------------------------------------------------------- |
+| `/api/messages`                        | POST   | Send a message to a group or user (auto-creates DM if not exists)   |
+| `/api/messages/upload`                 | POST   | Upload a file (max 10MB), returns public file URL                   |
+| `/api/messages/group/{groupId}`        | GET    | Fetch paginated messages for a group (default: page=1, pageSize=50) |
+| `/api/messages/group/{groupId}/search` | GET    | Search messages in a group by keyword                               |
+| `/api/messages/{id}`                   | PUT    | Edit a message's content by message ID                              |
+| `/api/messages/{id}`                   | DELETE | Soft delete a message by ID                                         |
+
+
+
 
 ### Groups
 
-| Endpoint                               | Method | Description           |
-| -------------------------------------- | ------ | --------------------- |
-| `/api/groups`                          | POST   | Create a new group    |
-| `/api/groups`                          | GET    | Get all groups        |
-| `/api/groups/{id}`                     | GET    | Get a group by ID     |
-| `/api/groups/{groupId}/users`          | GET    | List users in a group |
-| `/api/groups/{groupId}/users/{userId}` | POST   | Add a user to a group |
+| Endpoint                               | Method | Description                                     |
+| -------------------------------------- | ------ | ----------------------------------------------- |
+| `/api/groups`                          | POST   | Create a new group (optionally with users)      |
+| `/api/groups`                          | GET    | Get all groups                                  |
+| `/api/groups/{id}`                     | GET    | Get a group by its ID                           |
+| `/api/groups/{groupId}/users`          | GET    | Get all users in a specific group               |
+| `/api/groups/{groupId}/users/{userId}` | POST   | Add a user to a specific group (if not present) |
+
+
 
 
 ### Users
 
-| Endpoint                               | Method | Description           |
-| -------------------------------------- | ------ | --------------------- |
-| `/api/groups`                          | POST   | Create a new group    |
-| `/api/groups`                          | GET    | Get all groups        |
-| `/api/groups/{id}`                     | GET    | Get a group by ID     |
-| `/api/groups/{groupId}/users`          | GET    | List users in a group |
-| `/api/groups/{groupId}/users/{userId}` | POST   | Add a user to a group |
+| Endpoint                       | Method | Description                                          |
+| ------------------------------ | ------ | ---------------------------------------------------- |
+| `/api/users/all`               | GET    | Get a list of all users                              |
+| `/api/users/{userId}/contacts` | GET    | Get contact list (users with DM groups) for a user   |
+| `/api/users/add-contact`       | POST   | Add a contact (creates DM group if it doesn't exist) |
+
 
 ---
 
