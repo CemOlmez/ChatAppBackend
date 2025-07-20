@@ -19,6 +19,7 @@ namespace ChatApp.API.Controllers
         {
             _messageService = messageService;
         }
+
         [HttpPost]
         public async Task<IActionResult> SendMessage([FromBody] SendMessageRequestDTO request)
         {
@@ -41,28 +42,6 @@ namespace ChatApp.API.Controllers
             var message = await _messageService.SendMessageAsync(fullRequest);
             return Ok(message);
         }
-
-        [HttpGet("group/{groupId}")]
-        public async Task<IActionResult> GetMessagesByGroupId(Guid groupId, int page = 1, int pageSize = 50)
-        {
-            var messages = await _messageService.GetMessagesByGroupIdAsync(groupId, page, pageSize);
-            return Ok(messages);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMessage(Guid id, [FromBody] string newContent)
-        {
-            var updated = await _messageService.UpdateMessageAsync(id, newContent);
-            return updated == null ? NotFound() : Ok(updated);
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMessage(Guid id)
-        {
-            var success = await _messageService.DeleteMessageAsync(id);
-            return success ? NoContent() : NotFound();
-        }
-
 
         [HttpPost("upload")]
         [RequestSizeLimit(10_000_000)] // 10MB max (adjust as needed)
@@ -90,12 +69,38 @@ namespace ChatApp.API.Controllers
             return Ok(new { fileUrl });
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateMessage(Guid id, [FromBody] string newContent)
+        {
+            var updated = await _messageService.UpdateMessageAsync(id, newContent);
+            return updated == null ? NotFound() : Ok(updated);
+        }
+
+        [HttpGet("group/{groupId}")]
+        public async Task<IActionResult> GetMessagesByGroupId(Guid groupId, int page = 1, int pageSize = 50)
+        {
+            var messages = await _messageService.GetMessagesByGroupIdAsync(groupId, page, pageSize);
+            return Ok(messages);
+        }
+
         [HttpGet("group/{groupId}/search")]
         public async Task<IActionResult> SearchMessages(Guid groupId, [FromQuery] string keyword)
         {
             var results = await _messageService.SearchMessagesInGroupAsync(groupId, keyword);
             return Ok(results);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMessage(Guid id)
+        {
+            var success = await _messageService.DeleteMessageAsync(id);
+            return success ? NoContent() : NotFound();
+        }
+
+
+        
+
+        
 
 
 

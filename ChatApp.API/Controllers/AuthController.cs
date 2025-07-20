@@ -1,4 +1,4 @@
-﻿using ChatApp.Application.DTOs;
+﻿using ChatApp.Application.DTOs.Auth;
 using ChatApp.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,8 +29,8 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDTO request)
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDTO request)
     {
         var result = await _authService.RefreshTokenAsync(request.RefreshToken);
         return Ok(result);

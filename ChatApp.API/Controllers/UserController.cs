@@ -1,13 +1,12 @@
-﻿using ChatApp.Application.DTOs;
-using ChatApp.Application.DTOs.Group;
+﻿using ChatApp.Application.DTOs.Group;
 using ChatApp.Application.DTOs.Message;
 using ChatApp.Application.Interfaces;
-using ChatApp.Domain.Entities;
 using ChatApp.Infrastructure.DbContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using ChatApp.Application.DTOs.User;
 
 namespace ChatApp.API.Controllers
 {
@@ -24,31 +23,11 @@ namespace ChatApp.API.Controllers
             _context = context;
         }
 
-        [HttpPost("add-contact")]
-        public async Task<IActionResult> AddContact(AddContactRequestDTO request)
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllUsers()
         {
-            var success = await _userService.AddContactAsync(request);
-            if (!success)
-                return BadRequest("Failed to add contact or already added.");
-
-            return Ok("Contact added successfully.");
-        }
-
-        [HttpPost("create-direct")]
-        public async Task<IActionResult> CreateDirectChat(CreateDirectMessageRequestDTO request)
-        {
-            var groupId = await _userService.CreateDirectChatAsync(request);
-            return Ok(new { GroupId = groupId });
-        }
-
-        [HttpPost("add-to-group")]
-        public async Task<IActionResult> AddUserToGroup(AddUserToGroupRequestDTO request)
-        {
-            var success = await _userService.AddUserToGroupAsync(request);
-            if (!success)
-                return BadRequest("User or group not found, or user already in group.");
-
-            return Ok("User(s) added to group.");
+            var users = await _userService.GetAllUsersAsync();
+            return Ok(users);
         }
 
         [HttpGet("{userId}/contacts")]
@@ -58,19 +37,17 @@ namespace ChatApp.API.Controllers
             return Ok(contacts);
         }
 
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllUsers()
+        [HttpPost("add-contact")]
+        public async Task<IActionResult> AddContact(AddUserToContactsDTO request)
         {
-            var users = await _context.Users
-                .Select(u => new
-                {
-                    u.Id,
-                    u.Username,
-                    u.Email
-                })
-                .ToListAsync();
+            var success = await _userService.AddContactAsync(request);
+            if (!success)
+                return BadRequest("Failed to add contact or already added.");
 
-            return Ok(users);
+            return Ok("Contact added successfully.");
         }
+
+  
+
     }
 }

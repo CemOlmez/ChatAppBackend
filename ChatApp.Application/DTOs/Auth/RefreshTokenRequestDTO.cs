@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChatApp.Application.DTOs
+namespace ChatApp.Application.DTOs.Auth
 {
     public class RefreshTokenRequestDTO
     {
-        public string RefreshToken { get; set; } = string.Empty;
+        public string RefreshToken { get; set; } = null!;
     }
 }

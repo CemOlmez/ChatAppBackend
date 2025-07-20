@@ -1,5 +1,5 @@
-﻿using ChatApp.Application.DTOs;
-using ChatApp.Application.DTOs.Group;
+﻿using ChatApp.Application.DTOs.Group;
+using ChatApp.Application.DTOs.User;
 using ChatApp.Application.Interfaces;
 using ChatApp.Domain.Entities;
 using ChatApp.Infrastructure.DbContext;

@@ -1,5 +1,5 @@
-﻿using ChatApp.Application.DTOs;
-using ChatApp.Application.DTOs.Group;
+﻿using ChatApp.Application.DTOs.Group;
+using ChatApp.Application.DTOs.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;

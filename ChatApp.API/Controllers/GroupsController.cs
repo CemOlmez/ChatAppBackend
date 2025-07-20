@@ -38,5 +38,21 @@ namespace ChatApp.API.Controllers
             var group = await _groupService.GetGroupByIdAsync(id);
             return group == null ? NotFound() : Ok(group);
         }
+
+        [HttpPost("{groupId}/users/{userId}")]
+        public async Task<IActionResult> AddUserToGroup(Guid groupId, Guid userId)
+        {
+            var success = await _groupService.AddUserToGroupAsync(groupId, userId);
+            return success ? Ok("User added to group.") : BadRequest("User already in group or not found.");
+        }
+
+        [HttpGet("{groupId}/users")]
+        public async Task<IActionResult> GetUsersInGroup(Guid groupId)
+        {
+            var users = await _groupService.GetUsersInGroupAsync(groupId);
+            return Ok(users);
+        }
     }
+
+
 }

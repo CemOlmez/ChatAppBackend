@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChatApp.Application.DTOs
+namespace ChatApp.Application.DTOs.User
 {
-    public class AddContactRequestDTO
+    public class AddUserToContactsDTO
     {
         public Guid RequesterId { get; set; }
         public string TargetUsername { get; set; } = string.Empty;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChatApp.Application.DTOs
+namespace ChatApp.Application.DTOs.User
 {
     public class UserDTO
     {

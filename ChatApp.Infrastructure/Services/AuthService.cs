@@ -1,5 +1,5 @@
 ﻿using BCrypt.Net;
-using ChatApp.Application.DTOs;
+using ChatApp.Application.DTOs.Auth;
 using ChatApp.Application.Interfaces;
 using ChatApp.Domain.Entities;
 using ChatApp.Infrastructure.DbContext;
@@ -16,7 +16,7 @@ namespace ChatApp.Infrastructure.Services;
 public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
-    private readonly IConfiguration _configuration; // TODO: move to config
+    private readonly IConfiguration _configuration;
 
     public AuthService(AppDbContext context, IConfiguration configuration)
     {
@@ -42,7 +42,7 @@ public class AuthService : IAuthService
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
-        return CreateAuthResponse(user);
+        return CreateTokenResponse(user);
     }
 
     public async Task<AuthResponseDTO> LoginAsync(LoginRequestDTO request)
@@ -56,7 +56,7 @@ public class AuthService : IAuthService
 
         await _context.SaveChangesAsync();
 
-        return CreateAuthResponse(user);
+        return CreateTokenResponse(user);
     }
 
     public async Task<AuthResponseDTO> RefreshTokenAsync(string refreshToken)
@@ -72,10 +72,10 @@ public class AuthService : IAuthService
 
         await _context.SaveChangesAsync();
 
-        return CreateAuthResponse(user);
+        return CreateTokenResponse(user);
     }
 
-    private AuthResponseDTO CreateAuthResponse(User user)
+    private AuthResponseDTO CreateTokenResponse(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
@@ -89,8 +89,8 @@ public class AuthService : IAuthService
         new Claim(ClaimTypes.Email, user.Email)
     }),
             Expires = DateTime.UtcNow.AddMinutes(15),
-            Issuer = _configuration["Jwt:Issuer"],              // ✅ Add this
-            Audience = _configuration["Jwt:Audience"],          // ✅ Add this
+            Issuer = _configuration["Jwt:Issuer"],        
+            Audience = _configuration["Jwt:Audience"],
             SigningCredentials = new SigningCredentials(
         new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
@@ -106,6 +106,14 @@ public class AuthService : IAuthService
         };
     }
 
+    private static string GenerateRefreshToken()
+    {
+        var bytes = new byte[32];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(bytes);
+        return Convert.ToBase64String(bytes);
+    }
+
     public async Task<bool> LogoutAsync(string refreshToken)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
@@ -116,13 +124,5 @@ public class AuthService : IAuthService
         user.RefreshTokenExpiryTime = DateTime.MinValue;
         await _context.SaveChangesAsync();
         return true;
-    }
-
-    private static string GenerateRefreshToken()
-    {
-        var bytes = new byte[32];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(bytes);
-        return Convert.ToBase64String(bytes);
     }
 }

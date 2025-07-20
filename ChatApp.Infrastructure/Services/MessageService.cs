@@ -27,6 +27,42 @@ namespace ChatApp.Infrastructure.Services
 
         public async Task<MessageDTO> SendMessageAsync(SendMessageInternalDTO request)
         {
+            if (!request.GroupId.HasValue && request.ReceiverId.HasValue)
+            {
+                var existingGroup = await _context.Groups
+                    .Where(g => g.IsPrivate)
+                    .Where(g =>
+                        g.UserGroups.Count == 2 &&
+                        g.UserGroups.Any(ug => ug.UserId == request.SenderId) &&
+                        g.UserGroups.Any(ug => ug.UserId == request.ReceiverId))
+                    .FirstOrDefaultAsync();
+
+                if (existingGroup != null)
+                {
+                    request.GroupId = existingGroup.Id;
+                }
+                else
+                {
+                    var newGroup = new Group
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "DM",
+                        IsPrivate = true
+                    };
+
+                    _context.Groups.Add(newGroup);
+                    _context.UserGroups.AddRange(new List<UserGroup>
+        {
+            new UserGroup { GroupId = newGroup.Id, UserId = request.SenderId },
+            new UserGroup { GroupId = newGroup.Id, UserId = request.ReceiverId.Value }
+        });
+
+                    await _context.SaveChangesAsync();
+
+                    request.GroupId = newGroup.Id;
+                }
+            }
+
             var message = new Message
             {
                 SenderId = request.SenderId,

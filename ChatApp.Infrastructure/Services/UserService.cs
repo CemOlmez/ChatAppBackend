@@ -1,6 +1,6 @@
-﻿using ChatApp.Application.DTOs;
-using ChatApp.Application.DTOs.Group;
+﻿using ChatApp.Application.DTOs.Group;
 using ChatApp.Application.DTOs.Message;
+using ChatApp.Application.DTOs.User;
 using ChatApp.Application.Interfaces;
 using ChatApp.Domain.Entities;
 using ChatApp.Infrastructure.DbContext;
@@ -21,8 +21,33 @@ namespace ChatApp.Infrastructure.Services
         {
             _context = context;
         }
-
-        public async Task<bool> AddContactAsync(AddContactRequestDTO request)
+        public async Task<List<UserDTO>> GetAllUsersAsync()
+        {
+            return await _context.Users
+                .Select(u => new UserDTO
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    Email = u.Email
+                })
+                .ToListAsync();
+        }
+        public async Task<List<UserDTO>> GetContactsAsync(Guid userId)
+        {
+            return await _context.UserGroups
+                .Where(ug => ug.UserId == userId && ug.Group.IsPrivate)
+                .SelectMany(ug => ug.Group.UserGroups)
+                .Where(other => other.UserId != userId)
+                .Select(other => new UserDTO
+                {
+                    Id = other.User.Id,
+                    Username = other.User.Username,
+                    Email = other.User.Email
+                })
+                .Distinct()
+                .ToListAsync();
+        }
+        public async Task<bool> AddContactAsync(AddUserToContactsDTO request)
         {
             var requester = await _context.Users.FindAsync(request.RequesterId);
             var target = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.TargetUsername);
@@ -59,58 +84,7 @@ namespace ChatApp.Infrastructure.Services
             await _context.SaveChangesAsync();
             return true;
         }
-
-        public async Task<Guid> CreateDirectChatAsync(CreateDirectMessageRequestDTO request)
-        {
-            var group = new Group
-            {
-                Id = Guid.NewGuid(),
-                Name = "DM",
-                IsPrivate = true
-            };
-
-            _context.Groups.Add(group);
-
-            _context.UserGroups.AddRange(new List<UserGroup>
-        {
-            new UserGroup { UserId = request.SenderId, GroupId = group.Id },
-            new UserGroup { UserId = request.ReceiverId, GroupId = group.Id }
-        });
-
-            await _context.SaveChangesAsync();
-            return group.Id;
-        }
-
-        public async Task<bool> AddUserToGroupAsync(AddUserToGroupRequestDTO request)
-        {
-            var group = await _context.Groups.FindAsync(request.GroupId);
-            if (group == null) return false;
-
-            foreach (var userId in request.UserIds)
-            {
-                var exists = await _context.UserGroups.AnyAsync(ug => ug.UserId == userId && ug.GroupId == request.GroupId);
-                if (!exists)
-                    _context.UserGroups.Add(new UserGroup { GroupId = request.GroupId, UserId = userId });
-            }
-
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<List<UserDTO>> GetContactsAsync(Guid userId)
-        {
-            return await _context.UserGroups
-                .Where(ug => ug.UserId == userId && ug.Group.IsPrivate)
-                .SelectMany(ug => ug.Group.UserGroups)
-                .Where(other => other.UserId != userId)
-                .Select(other => new UserDTO
-                {
-                    Id = other.User.Id,
-                    Username = other.User.Username,
-                    Email = other.User.Email
-                })
-                .Distinct()
-                .ToListAsync();
-        }
+        
+        
     }
 }
