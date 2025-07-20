@@ -45,7 +45,7 @@ namespace ChatApp.API.Controllers
         [HttpGet("group/{groupId}")]
         public async Task<IActionResult> GetMessagesByGroupId(Guid groupId, int page = 1, int pageSize = 50)
         {
-            var messages = await _messageService.GetMessagesByGroupIdAsync(groupId);
+            var messages = await _messageService.GetMessagesByGroupIdAsync(groupId, page, pageSize);
             return Ok(messages);
         }
 
@@ -88,6 +88,13 @@ namespace ChatApp.API.Controllers
             var fileUrl = $"{Request.Scheme}://{Request.Host}/uploads/{fileName}";
 
             return Ok(new { fileUrl });
+        }
+
+        [HttpGet("group/{groupId}/search")]
+        public async Task<IActionResult> SearchMessages(Guid groupId, [FromQuery] string keyword)
+        {
+            var results = await _messageService.SearchMessagesInGroupAsync(groupId, keyword);
+            return Ok(results);
         }
 
 
