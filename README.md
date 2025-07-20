@@ -1,24 +1,26 @@
+
 # ChatApp Backend
 
 A real-time chat backend built with ASP.NET Core, Entity Framework, PostgreSQL, SignalR, and Redis. This service supports secure authentication, private/group messaging, file uploads, and WebSocket-based real-time communication.
 
 ---
+Demo (deployed on Render): https://chatappbackend-gz8t.onrender.com/swagger
 
-## 🧠 Features
+## Features
 
-- ✅ JWT-based authentication with refresh token rotation
-- ✅ Private 1:1 messaging (auto-creates DM group if missing)
-- ✅ Group creation and user management
-- ✅ File upload (max 10MB to `wwwroot/uploads`)
-- ✅ Soft-delete and update messages
-- ✅ Full-text search within groups
-- ✅ Redis caching for message history
-- ✅ Real-time messaging using SignalR
-- ✅ RESTful API with Swagger documentation
+- JWT-based authentication with refresh token rotation
+- Private 1:1 messaging (auto-creates DM group if missing)
+- Group creation and user management
+- File upload (max 10MB to `wwwroot/uploads`)
+- Soft-delete and update messages
+- Full-text search within groups
+- Redis caching for message history
+- Real-time messaging using SignalR
+- RESTful API with Swagger documentation
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ChatApp/
@@ -34,13 +36,13 @@ ChatApp/
 ├── ChatApp.Infrastructure   # EF, Services, Caching (Redis)
 │   ├── DbContext/
 │   ├── Services/
-│   └── Cache/         # RedisCacheService
+│   └── Cache/               # RedisCacheService
 └── README.md
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer       | Tech                         |
 |------------|------------------------------|
@@ -56,9 +58,9 @@ ChatApp/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### ✅ Prerequisites
+### Prerequisites
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download)
 - [Docker](https://www.docker.com/)
@@ -67,7 +69,7 @@ ChatApp/
 
 ---
 
-### 🧾 1. Clone the Repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/your-username/ChatApp.git
@@ -76,7 +78,15 @@ cd ChatApp
 
 ---
 
-### ⚙️ 2. Configure `appsettings.json`
+### 2. Configure `appsettings.json` (Optional)
+
+This project includes default values that match the `docker-compose.yml` setup.
+
+If you're using Docker Compose, you do **not** need to modify `appsettings.json`.
+
+Only change this if:
+- You want to connect to a custom PostgreSQL or Redis server.
+- You're not using Docker for your local setup.
 
 ```json
 "ConnectionStrings": {
@@ -94,19 +104,24 @@ cd ChatApp
 
 ---
 
-### 🐳 3. Run with Docker Compose
-
-A `docker-compose.yml` file is included to run PostgreSQL, Redis, and the backend container.
+### 3. Run with Docker Compose
 
 ```bash
 docker-compose up --build
 ```
 
+Services spun up:
+- PostgreSQL on port 5432
+- Redis on port 6379
+- API on http://localhost:8080
+
+Access Swagger at: [http://localhost:8080/swagger](http://localhost:8080/swagger)
+
 ---
 
 ## 📡 API Usage
 
-### 🔐 Auth
+### Auth
 
 | Endpoint                   | Method | Description                     |
 |---------------------------|--------|---------------------------------|
@@ -115,109 +130,96 @@ docker-compose up --build
 | `/api/auth/refresh-token` | POST   | Get new JWT via refresh token   |
 | `/api/auth/logout`        | POST   | Revoke refresh token            |
 
----
+### Messages
 
-### 💬 Messages
+| Endpoint                               | Method | Description                           |
+| -------------------------------------- | ------ | ------------------------------------- |
+| `/api/messages`                        | POST   | Send a message (DM or group)          |
+| `/api/messages/upload`                 | POST   | Upload a file (up to 10MB)            |
+| `/api/messages/group/{groupId}`        | GET    | Get paginated messages in a group     |
+| `/api/messages/group/{groupId}/search` | GET    | Search messages in a group by keyword |
+| `/api/messages/{id}`                   | PUT    | Update/edit a message                 |
+| `/api/messages/{id}`                   | DELETE | Soft-delete a message                 |
 
-| Endpoint                          | Method | Description                      |
-|----------------------------------|--------|----------------------------------|
-| `/api/messages`                  | POST   | Send a message (DM or group)     |
-| `/api/messages/group/{groupId}`  | GET    | Fetch paginated group messages   |
-| `/api/messages/{id}`             | PUT    | Edit a message                   |
-| `/api/messages/{id}`             | DELETE | Soft delete a message            |
-| `/api/messages/group/{groupId}/search` | GET | Search messages in group         |
+### Groups
 
----
+| Endpoint                               | Method | Description           |
+| -------------------------------------- | ------ | --------------------- |
+| `/api/groups`                          | POST   | Create a new group    |
+| `/api/groups`                          | GET    | Get all groups        |
+| `/api/groups/{id}`                     | GET    | Get a group by ID     |
+| `/api/groups/{groupId}/users`          | GET    | List users in a group |
+| `/api/groups/{groupId}/users/{userId}` | POST   | Add a user to a group |
 
-### 👥 Groups
 
-| Endpoint           | Method | Description              |
-|--------------------|--------|--------------------------|
-| `/api/groups`      | POST   | Create a new group       |
-| `/api/groups`      | GET    | Get all groups           |
-| `/api/groups/{id}` | GET    | Get group by ID          |
+### Users
 
----
-
-### 🙋 Users
-
-| Endpoint                    | Method | Description                  |
-|-----------------------------|--------|------------------------------|
-| `/api/users/contacts`       | GET    | Get contact list             |
-| `/api/users/add-contact`    | POST   | Add user to contact list     |
-| `/api/users/{id}`           | GET    | Get user by ID               |
-
----
-
-## ⚙️ CI/CD Overview
-
-Planned CI/CD with **GitHub Actions**:
-
-- ✅ Linting
-- ✅ Testing with xUnit
-- ✅ Build and deploy on push
-- Future: container deploy to Azure / Railway
+| Endpoint                               | Method | Description           |
+| -------------------------------------- | ------ | --------------------- |
+| `/api/groups`                          | POST   | Create a new group    |
+| `/api/groups`                          | GET    | Get all groups        |
+| `/api/groups/{id}`                     | GET    | Get a group by ID     |
+| `/api/groups/{groupId}/users`          | GET    | List users in a group |
+| `/api/groups/{groupId}/users/{userId}` | POST   | Add a user to a group |
 
 ---
 
-## ☁️ Deployment Steps
 
-### 🧪 Docker Deployment (Local)
-Docker Deployment (Local)
-Docker Deployment (Local)
+## Local Deployment with Docker
 
-1. Clone the repo and navigate to the root directory.
-2. Ensure Docker Desktop is running.
-3. Build and Run the App:
+1. **Clone the Repository**  
+   ```bash
+   git clone https://github.com/your-username/ChatApp.git
+   cd ChatApp
+   ```
 
-```bash
-docker-compose up --build
-```
+2. **Ensure Docker is Installed & Running**  
+   [Install Docker](https://www.docker.com/products/docker-desktop/)
 
-This will spin up:
-PostgreSQL on port 5432
-Redis on port 6379
-ASP.NET Core API on http://localhost:8080
+3. **Run with Docker Compose**  
+   ```bash
+   docker-compose up --build
+   ```
 
-4. Access Swagger:: `http://localhost:8080/swagger`
-
-### ☁️ VPS / Cloud Deployment
-
-1. Set environment variables:
-   - `DefaultConnection` string
-   - `Redis:ConnectionString`
-   - `Jwt` credentials
-2. Ensure NGINX/SSL reverse proxy setup.
-3. Publish `.NET` backend and host with Kestrel or Docker on:
-   - Railway (simplest)
-   - Azure App Service + Redis
-   - AWS Lightsail + PostgreSQL + Redis
+4. **Access the API via Swagger:**  
+   [http://localhost:8080/swagger](http://localhost:8080/swagger)
 
 ---
 
-## 🧠 Assumptions & Tradeoffs
+## Cloud Deployment (Render)
 
-- ✅ Used local disk storage for simplicity (swap for S3/Blob in real deployment).
-- ✅ No admin UI panel — API only.
-- ✅ Redis used only for message cache; MongoDB not required in this phase.
-- ✅ JWT secret hardcoded in development only.
-- ✅ Focus was on clean, testable service logic, not frontend or mobile integration.
-- ✅ SignalR is configured but can be scaled via Azure SignalR or Redis backplane if needed.
+> The app is already deployed and accessible here:  
+> 🔗 **[Live Swagger](https://chatappbackend-gz8t.onrender.com/swagger/index.html)**
+
+To deploy your own version:
+
+1. **Push the project to GitHub**  
+2. **Create a new Web Service on [Render](https://render.com/)**  
+   - Connect your GitHub repo
+   - Choose "Docker" deployment
+   - Set the root directory and build context to `.`
+
+3. **Add Environment Variables in Render Dashboard**
+
+| Key                          | Value                         |
+|------------------------------|-------------------------------|
+| `ConnectionStrings__DefaultConnection` | your PostgreSQL connection string |
+| `Redis__ConnectionString`   | your Redis connection string   |
+| `Jwt__Key`                  | your JWT secret key            |
+| `Jwt__Issuer`               | your app issuer                |
+| `Jwt__Audience`             | your app audience              |
+
+4. **Deploy** and access the app from your Render subdomain.
 
 ---
 
-## 📧 Delivery
+## CI/CD Overview
 
-1. Pushed to public GitHub repo.
-2. Link shared via email to `hr@bluesense.com`.
-3. This README includes:
-   - ✅ Setup
-   - ✅ API usage
-   - ✅ CI/CD Overview
-   - ✅ Deployment steps
-   - ✅ Assumptions
+CI/CD was not fully implemented due to time constraints and because this was my first time working with cloud deployment and pipelines. While GitHub Actions or similar tools could be integrated for automatic build and deployment, the current project relies on manual deployment via Docker and Render. 
+
+## Testing
+
+Unit tests were not included due to limited time. In a real production scenario, I would use xUnit or NUnit to test core logic and controller behavior. This will be included in the next version.
 
 ---
 
-## ✅ Good luck reviewers!
-Treat it like production — that’s what we did.
