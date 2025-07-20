@@ -73,7 +73,6 @@ ChatApp/
 
 ```bash
 git clone https://github.com/your-username/ChatApp.git
-cd ChatApp
 ```
 
 ---
@@ -106,16 +105,73 @@ Only change this if:
 
 ### 3. Run with Docker Compose
 
-```bash
-docker-compose up --build
-```
+## Local Deployment with Docker
 
-Services spun up:
-- PostgreSQL on port 5432
-- Redis on port 6379
-- API on http://localhost:8080
+1. **Clone the Repository**  
+   ```bash
+   git clone https://github.com/your-username/ChatApp.git
 
-Access Swagger at: [http://localhost:8080/swagger](http://localhost:8080/swagger)
+   ```
+
+2. **Ensure Docker is Installed & Running**  
+   [Install Docker](https://www.docker.com/products/docker-desktop/)
+
+3. **Run with Docker Compose**  
+   ```bash
+   docker-compose up --build
+   ```
+
+4. **Access the API via Swagger:**  
+   [http://localhost:8080/swagger](http://localhost:8080/swagger)
+
+---
+
+## Cloud Deployment (Render)
+
+> The app is already deployed and accessible here:  
+> 🔗 **[Live Swagger](https://chatappbackend-gz8t.onrender.com/swagger/index.html)**
+
+To deploy your own version:
+
+1. **Push the project to GitHub**  
+2. **Create a new Web Service on [Render](https://render.com/)**  
+   - Connect your GitHub repo
+   - Choose "Docker" deployment
+   - Set the root directory and build context to `.`
+
+3. **Add Environment Variables in Render Dashboard**
+
+| Key                          | Value                         |
+|------------------------------|-------------------------------|
+| `ConnectionStrings__DefaultConnection` | your PostgreSQL connection string |
+| `Redis__ConnectionString`   | your Redis connection string   |
+| `Jwt__Key`                  | your JWT secret key            |
+| `Jwt__Issuer`               | your app issuer                |
+| `Jwt__Audience`             | your app audience              |
+
+4. **Deploy** and access the app from your Render subdomain.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ---
 
@@ -164,56 +220,6 @@ Access Swagger at: [http://localhost:8080/swagger](http://localhost:8080/swagger
 | `/api/users/all`               | GET    | Get a list of all users                              |
 | `/api/users/{userId}/contacts` | GET    | Get contact list (users with DM groups) for a user   |
 | `/api/users/add-contact`       | POST   | Add a contact (creates DM group if it doesn't exist) |
-
-
----
-
-
-## Local Deployment with Docker
-
-1. **Clone the Repository**  
-   ```bash
-   git clone https://github.com/your-username/ChatApp.git
-   cd ChatApp
-   ```
-
-2. **Ensure Docker is Installed & Running**  
-   [Install Docker](https://www.docker.com/products/docker-desktop/)
-
-3. **Run with Docker Compose**  
-   ```bash
-   docker-compose up --build
-   ```
-
-4. **Access the API via Swagger:**  
-   [http://localhost:8080/swagger](http://localhost:8080/swagger)
-
----
-
-## Cloud Deployment (Render)
-
-> The app is already deployed and accessible here:  
-> 🔗 **[Live Swagger](https://chatappbackend-gz8t.onrender.com/swagger/index.html)**
-
-To deploy your own version:
-
-1. **Push the project to GitHub**  
-2. **Create a new Web Service on [Render](https://render.com/)**  
-   - Connect your GitHub repo
-   - Choose "Docker" deployment
-   - Set the root directory and build context to `.`
-
-3. **Add Environment Variables in Render Dashboard**
-
-| Key                          | Value                         |
-|------------------------------|-------------------------------|
-| `ConnectionStrings__DefaultConnection` | your PostgreSQL connection string |
-| `Redis__ConnectionString`   | your Redis connection string   |
-| `Jwt__Key`                  | your JWT secret key            |
-| `Jwt__Issuer`               | your app issuer                |
-| `Jwt__Audience`             | your app audience              |
-
-4. **Deploy** and access the app from your Render subdomain.
 
 ---
 
