@@ -124,6 +124,13 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger"; // This ensures it's available at /swagger
 });
 
+// Auto-apply migrations
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
+
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
