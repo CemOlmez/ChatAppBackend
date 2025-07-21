@@ -69,8 +69,13 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
+var redisOptions = ConfigurationOptions.Parse(configuration["Redis:ConnectionString"]);
+redisOptions.Ssl = true;
+redisOptions.AbortOnConnectFail = false;
+
+
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
-    ConnectionMultiplexer.Connect(configuration["Redis:ConnectionString"]));
+    ConnectionMultiplexer.Connect(redisOptions));
 
 // ------------------ DI: Services ------------------
 builder.Services.AddScoped<IAuthService, AuthService>();
