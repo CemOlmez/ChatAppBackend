@@ -20,14 +20,29 @@ namespace ChatApp.Infrastructure.Cache
 
         public async Task<T?> GetAsync<T>(string key)
         {
-            var data = await _db.StringGetAsync(key);
-            return data.IsNullOrEmpty ? default : JsonSerializer.Deserialize<T>(data);
+            try
+            {
+                var data = await _db.StringGetAsync(key);
+                return data.IsNullOrEmpty ? default : JsonSerializer.Deserialize<T>(data);
+            }
+            catch (RedisConnectionException ex)
+            {
+                Console.WriteLine($"[Redis] GetAsync failed: {ex.Message}");
+                return default; // fallback to DB query
+            }
         }
 
         public async Task SetAsync<T>(string key, T value, TimeSpan expiration)
         {
-            var json = JsonSerializer.Serialize(value);
-            await _db.StringSetAsync(key, json, expiration);
+            try
+            {
+                var json = JsonSerializer.Serialize(value);
+                await _db.StringSetAsync(key, json, expiration);
+            }
+            catch (RedisConnectionException ex)
+            {
+                Console.WriteLine($"[Redis] SetAsync failed: {ex.Message}");
+            }
         }
 
         public async Task RemoveAsync(string key)
