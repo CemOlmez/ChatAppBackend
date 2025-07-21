@@ -70,11 +70,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
-{
-    var redisConfig = ConfigurationOptions.Parse(configuration["Redis:ConnectionString"], true);
-    redisConfig.AbortOnConnectFail = false;
-    return ConnectionMultiplexer.Connect(redisConfig);
-});
+    ConnectionMultiplexer.Connect(configuration["Redis:ConnectionString"]));s
 
 // ------------------ DI: Services ------------------
 builder.Services.AddScoped<IAuthService, AuthService>();
