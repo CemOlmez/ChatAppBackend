@@ -32,7 +32,15 @@ namespace ChatApp.Infrastructure.Cache
 
         public async Task RemoveAsync(string key)
         {
-            await _db.KeyDeleteAsync(key);
+            try
+            {
+                await _db.KeyDeleteAsync(key);
+            }
+            catch (RedisConnectionException ex)
+            {
+                Console.WriteLine($"[Redis] RemoveAsync failed: {ex.Message}");
+                // Optional: log somewhere or just swallow the error in production
+            }
         }
     }
 }

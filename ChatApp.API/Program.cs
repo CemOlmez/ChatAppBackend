@@ -74,6 +74,7 @@ redisOptions.Ssl = true;
 redisOptions.AbortOnConnectFail = false;
 
 
+
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
     ConnectionMultiplexer.Connect(redisOptions));
 
